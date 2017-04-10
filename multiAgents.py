@@ -158,8 +158,45 @@ class MinimaxAgent(MultiAgentSearchAgent):
             Returns the total number of agents in the game
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        # util.raiseNotDefined()
+        # print gameState.getNumAgents()
+        v, a = MaxValue(self, gameState, self.depth)
+        # print v, a
+        return a
 
+def MaxValue(minimaxAgent, gameState, leftDepth):
+    # print "max",
+    if CutoffTest(gameState, leftDepth):
+        # print "stop"
+        return (minimaxAgent.evaluationFunction(gameState), None)
+    v = []
+    for a in gameState.getLegalActions(0):
+        # print "call min"
+        v.append((MinValue(minimaxAgent, gameState.generateSuccessor(0, a), leftDepth, gameState.getNumAgents()-1)[0], a))
+    return max(v)
+    # pass
+
+def MinValue(minimaxAgent, gameState, leftDepth, leftGhost):
+    # print "min",
+    if CutoffTest(gameState, leftDepth):
+        # print "stop"
+        return (minimaxAgent.evaluationFunction(gameState), None)
+    v = []
+    if leftGhost > 1:
+        for a in gameState.getLegalActions(gameState.getNumAgents() - leftGhost):
+            # print "call min"
+            v.append((MinValue(minimaxAgent, gameState.generateSuccessor(gameState.getNumAgents() - leftGhost, a), leftDepth, leftGhost-1)[0], None))
+    else:
+        for a in gameState.getLegalActions(gameState.getNumAgents() - leftGhost):
+            # print "call max"
+            v.append((MaxValue(minimaxAgent, gameState.generateSuccessor(gameState.getNumAgents() - leftGhost, a), leftDepth - 1)[0], None))
+    return min(v)
+    # pass
+
+def CutoffTest(gameState, leftDepth):
+    # print gameState.isWin(), gameState.isLose()
+    return leftDepth == 0 or gameState.isWin() or gameState.isLose()
+    # pass
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """
       Your minimax agent with alpha-beta pruning (question 3)
