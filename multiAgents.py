@@ -4,7 +4,7 @@
 # educational purposes provided that (1) you do not distribute or publish
 # solutions, (2) you retain this notice, and (3) you provide clear
 # attribution to UC Berkeley, including a link to http://ai.berkeley.edu.
-# 
+#
 # Attribution Information: The Pacman AI projects were developed at UC Berkeley.
 # The core projects and autograders were primarily created by John DeNero
 # (denero@cs.berkeley.edu) and Dan Klein (klein@cs.berkeley.edu).
@@ -43,12 +43,13 @@ class ReflexAgent(Agent):
 
         # Choose one of the best actions
         scores = [self.evaluationFunction(gameState, action) for action in legalMoves]
+        # print zip(scores, legalMoves),
         bestScore = max(scores)
         bestIndices = [index for index in range(len(scores)) if scores[index] == bestScore]
         chosenIndex = random.choice(bestIndices) # Pick randomly among the best
 
         "Add more of your code here if you want to"
-
+        # print legalMoves[chosenIndex]
         return legalMoves[chosenIndex]
 
     def evaluationFunction(self, currentGameState, action):
@@ -74,7 +75,35 @@ class ReflexAgent(Agent):
         newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
 
         "*** YOUR CODE HERE ***"
-        return successorGameState.getScore()
+        # print currentGameState
+        # print successorGameState
+        # print newPos
+        # print newFood
+        # print newGhostStates[0]
+        # print newScaredTimes
+        # oldGhostPos = [oldGhostState.getPosition() for oldGhostState in currentGameState.getGhostStates()]
+        newGhostPos = [newGhostState.getPosition() for newGhostState in newGhostStates]
+        # print oldGhostPos == newGhostPos
+        # print newPos, newGhostPos
+            # print "*"*50
+        scoreAdjust = 0.0
+        scoreAdjust -= (500 if min([util.manhattanDistance(newPos, posItem) for posItem in newGhostPos]) < 2 else 0)
+
+        # oldFoodPos = currentGameState.getFood()
+        foodPos = newFood.asList()
+        # print foodPos, successorGameState.isWin(), currentGameState.isWin()
+        currentPos = currentGameState.getPacmanPosition()
+        if successorGameState.isWin():
+            scoreAdjust += 1
+        else:
+            currentClosestFood = min([util.manhattanDistance(currentPos, item) for item in foodPos])
+            newClosestFood = min([util.manhattanDistance(newPos, item) for item in foodPos])
+            scoreAdjust += 1*random.randint(0, 1) if newClosestFood < currentClosestFood else 0
+        # print successorGameState.getScore() + scoreAdjust
+
+
+        # result = 0.0 + util.manhattanDistance()
+        return successorGameState.getScore() + scoreAdjust
 
 def scoreEvaluationFunction(currentGameState):
     """
@@ -170,4 +199,3 @@ def betterEvaluationFunction(currentGameState):
 
 # Abbreviation
 better = betterEvaluationFunction
-
