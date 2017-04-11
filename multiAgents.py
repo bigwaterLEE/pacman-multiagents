@@ -346,7 +346,31 @@ def betterEvaluationFunction(currentGameState):
       DESCRIPTION: <write something here so we know what you did>
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    # util.raiseNotDefined()
+    scoreAdjust = 0.0
+
+    currentPos = currentGameState.getPacmanPosition()
+    foodPos = currentGameState.getFood().asList()
+    closestFood = [util.manhattanDistance(food, currentPos) for food in foodPos]
+    scoreAdjust = ((0.5)**min(closestFood))*10 if len(closestFood) > 0  else 0
+
+    capsulePos = currentGameState.getCapsules()
+    closestCapsule = [util.manhattanDistance(capsule, currentPos) for capsule in capsulePos]
+    scoreAdjust = ((0.5)**min(closestCapsule))*20 if len(closestCapsule) > 0  else 0
+
+    ghostStates = currentGameState.getGhostStates()
+    targetGhost = [(0.5**util.manhattanDistance(ghost.getPosition(), currentPos))*200 for ghost in ghostStates if util.manhattanDistance(ghost.getPosition(), currentPos) < ghost.scaredTimer]
+    targetGhost.append(0)
+    scoreAdjust += max(targetGhost)
+
+    # scoreAdjust += currentPos[0] + currentPos[1]
+    # maxManhattan = min(closestCapsule) if len(closestCapsule) > 0 else 0
+    # random.seed()
+    # scoreAdjust += (0.5**(maxManhattan + 3))*random.random()
+    temp = [(0.5**util.manhattanDistance(ghost.getPosition(), currentPos))*2 for ghost in ghostStates if ghost.scaredTimer == 0]
+    temp.append(0)
+    scoreAdjust += max(temp)
+    return currentGameState.getScore() + scoreAdjust
 
 # Abbreviation
 better = betterEvaluationFunction
