@@ -207,7 +207,84 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
           Returns the minimax action using self.depth and self.evaluationFunction
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        # util.raiseNotDefined()
+        v, a = MaxValueAB(self, gameState, self.depth,-10000.0, 10000.0)
+        # print v, a
+        return a
+
+def MaxValueAB(minimaxAgent, gameState, leftDepth, l, u):
+    # print "max",
+    if CutoffTest(gameState, leftDepth):
+        # print "stop"
+        return (minimaxAgent.evaluationFunction(gameState), None)
+    v = []
+    for a in gameState.getLegalActions(0):
+        # print "call min"
+        temp = MinValueAB(minimaxAgent, gameState.generateSuccessor(0, a), leftDepth, gameState.getNumAgents()-1, l, u)[0]
+        if temp > u:
+            return (temp, a)
+        v.append((temp, a))
+        l = max(max(v)[0], l)
+    return max(v)
+    # pass
+
+def MinValueAB(minimaxAgent, gameState, leftDepth, leftGhost, l, u):
+    # print "min",
+    if CutoffTest(gameState, leftDepth):
+        # print "stop"
+        return (minimaxAgent.evaluationFunction(gameState), None)
+    v = []
+    if leftGhost > 1:
+        for a in gameState.getLegalActions(gameState.getNumAgents() - leftGhost):
+            # print "call min"
+            temp = MinValueAB(minimaxAgent, gameState.generateSuccessor(gameState.getNumAgents() - leftGhost, a), leftDepth, leftGhost-1, l, u)[0]
+            if temp < l:
+                return (temp, None)
+            v.append((temp, None))
+            u = min(min(v)[0], u)
+    else:
+        for a in gameState.getLegalActions(gameState.getNumAgents() - leftGhost):
+            # print "call max"
+            temp = MaxValueAB(minimaxAgent, gameState.generateSuccessor(gameState.getNumAgents() - leftGhost, a), leftDepth - 1, l, u)[0]
+            if temp < l:
+                return (temp, None)
+            v.append((temp, None))
+            u = min(min(v)[0], u)
+    return min(v)
+    # pass
+
+# def MinValueAB(minimaxAgent, gameState, leftDepth, leftGhost, l, u):
+#     # print "min",
+#     if CutoffTest(gameState, leftDepth):
+#         # print "stop"
+#         return (minimaxAgent.evaluationFunction(gameState), None)
+#     v = [(10000.0, None)]
+#     if leftGhost == gameState.getNumAgents()-1:
+#         if leftGhost > 1:
+#             for a in gameState.getLegalActions(gameState.getNumAgents() - leftGhost):
+#                 # print "call min"
+#                 temp = MinValueAB(minimaxAgent, gameState.generateSuccessor(gameState.getNumAgents() - leftGhost, a), leftDepth, leftGhost-1, min(v))[0]
+#                 if (temp, None) <= upperEtremum:
+#                     return (temp, None)
+#                 v.append((temp, None))
+#         else:
+#             for a in gameState.getLegalActions(gameState.getNumAgents() - leftGhost):
+#                 # print "call max"
+#                 temp = MaxValueAB(minimaxAgent, gameState.generateSuccessor(gameState.getNumAgents() - leftGhost, a), leftDepth - 1, min(v))[0]
+#                 if (temp, None) <= upperEtremum:
+#                     return (temp, None)
+#                 v.append((temp, None))
+#     else:
+#         if leftGhost > 1:
+#             for a in gameState.getLegalActions(gameState.getNumAgents() - leftGhost):
+#                 # print "call min"
+#                 v.append((MinValueAB(minimaxAgent, gameState.generateSuccessor(gameState.getNumAgents() - leftGhost, a), leftDepth, leftGhost-1, min(v))[0], None))
+#         else:
+#             for a in gameState.getLegalActions(gameState.getNumAgents() - leftGhost):
+#                 # print "call max"
+#                 v.append((MaxValueAB(minimaxAgent, gameState.generateSuccessor(gameState.getNumAgents() - leftGhost, a), leftDepth - 1, min(v))[0], None))
+#     return min(v)
+#     # pass
 
 class ExpectimaxAgent(MultiAgentSearchAgent):
     """
