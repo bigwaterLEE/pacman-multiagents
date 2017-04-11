@@ -299,7 +299,44 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
           legal moves.
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        # util.raiseNotDefined()
+        # print gameState.getNumAgents()
+        v, a = ExpectMax(self, gameState, self.depth)
+        # print v, a
+        return a
+
+def ExpectMax(minimaxAgent, gameState, leftDepth):
+    # print "max",
+    if CutoffTest(gameState, leftDepth):
+        # print "stop"
+        return (minimaxAgent.evaluationFunction(gameState), None)
+    v = []
+    for a in gameState.getLegalActions(0):
+        # print "call min"
+        v.append((ChanceValue(minimaxAgent, gameState.generateSuccessor(0, a), leftDepth, gameState.getNumAgents()-1)[0], a))
+    return max(v)
+    # pass
+
+def ChanceValue(minimaxAgent, gameState, leftDepth, leftGhost):
+    # print "min",
+    if CutoffTest(gameState, leftDepth):
+        # print "stop"
+        return (minimaxAgent.evaluationFunction(gameState), None)
+    v = []
+    if leftGhost > 1:
+        for a in gameState.getLegalActions(gameState.getNumAgents() - leftGhost):
+            # print "call min"
+            v.append((ChanceValue(minimaxAgent, gameState.generateSuccessor(gameState.getNumAgents() - leftGhost, a), leftDepth, leftGhost-1)[0], None))
+    else:
+        for a in gameState.getLegalActions(gameState.getNumAgents() - leftGhost):
+            # print "call max"
+            v.append((ExpectMax(minimaxAgent, gameState.generateSuccessor(gameState.getNumAgents() - leftGhost, a), leftDepth - 1)[0], None))
+    vSum = 0.0
+    for value, item in v:
+        vSum += value
+    vAverage = vSum/len(v)
+    return (vAverage, None)
+    # pass
 
 def betterEvaluationFunction(currentGameState):
     """
