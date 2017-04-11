@@ -253,39 +253,6 @@ def MinValueAB(minimaxAgent, gameState, leftDepth, leftGhost, l, u):
     return min(v)
     # pass
 
-# def MinValueAB(minimaxAgent, gameState, leftDepth, leftGhost, l, u):
-#     # print "min",
-#     if CutoffTest(gameState, leftDepth):
-#         # print "stop"
-#         return (minimaxAgent.evaluationFunction(gameState), None)
-#     v = [(10000.0, None)]
-#     if leftGhost == gameState.getNumAgents()-1:
-#         if leftGhost > 1:
-#             for a in gameState.getLegalActions(gameState.getNumAgents() - leftGhost):
-#                 # print "call min"
-#                 temp = MinValueAB(minimaxAgent, gameState.generateSuccessor(gameState.getNumAgents() - leftGhost, a), leftDepth, leftGhost-1, min(v))[0]
-#                 if (temp, None) <= upperEtremum:
-#                     return (temp, None)
-#                 v.append((temp, None))
-#         else:
-#             for a in gameState.getLegalActions(gameState.getNumAgents() - leftGhost):
-#                 # print "call max"
-#                 temp = MaxValueAB(minimaxAgent, gameState.generateSuccessor(gameState.getNumAgents() - leftGhost, a), leftDepth - 1, min(v))[0]
-#                 if (temp, None) <= upperEtremum:
-#                     return (temp, None)
-#                 v.append((temp, None))
-#     else:
-#         if leftGhost > 1:
-#             for a in gameState.getLegalActions(gameState.getNumAgents() - leftGhost):
-#                 # print "call min"
-#                 v.append((MinValueAB(minimaxAgent, gameState.generateSuccessor(gameState.getNumAgents() - leftGhost, a), leftDepth, leftGhost-1, min(v))[0], None))
-#         else:
-#             for a in gameState.getLegalActions(gameState.getNumAgents() - leftGhost):
-#                 # print "call max"
-#                 v.append((MaxValueAB(minimaxAgent, gameState.generateSuccessor(gameState.getNumAgents() - leftGhost, a), leftDepth - 1, min(v))[0], None))
-#     return min(v)
-#     # pass
-
 class ExpectimaxAgent(MultiAgentSearchAgent):
     """
       Your expectimax agent (question 4)
