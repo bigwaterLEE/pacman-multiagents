@@ -318,12 +318,12 @@ def betterEvaluationFunction(currentGameState):
 
     currentPos = currentGameState.getPacmanPosition()
     foodPos = currentGameState.getFood().asList()
-    closestFood = [util.manhattanDistance(food, currentPos) for food in foodPos]
-    scoreAdjust = ((0.5)**min(closestFood))*10 if len(closestFood) > 0  else 0
+    closestFood = [(util.manhattanDistance(food, currentPos), foodId) for food, foodId in zip(foodPos, range(len(foodPos)))]
+    scoreAdjust = ((0.5)**min(closestFood)[0])*10 if len(closestFood) > 0  else 0
 
     capsulePos = currentGameState.getCapsules()
     closestCapsule = [util.manhattanDistance(capsule, currentPos) for capsule in capsulePos]
-    scoreAdjust = ((0.5)**min(closestCapsule))*20 if len(closestCapsule) > 0  else 0
+    scoreAdjust = ((0.5)**min(closestCapsule))*10 if len(closestCapsule) > 0  else 0
 
     ghostStates = currentGameState.getGhostStates()
     targetGhost = [(0.5**util.manhattanDistance(ghost.getPosition(), currentPos))*200 for ghost in ghostStates if util.manhattanDistance(ghost.getPosition(), currentPos) < ghost.scaredTimer]
@@ -334,9 +334,22 @@ def betterEvaluationFunction(currentGameState):
     # maxManhattan = min(closestCapsule) if len(closestCapsule) > 0 else 0
     # random.seed()
     # scoreAdjust += (0.5**(maxManhattan + 3))*random.random()
-    temp = [(0.5**util.manhattanDistance(ghost.getPosition(), currentPos))*2 for ghost in ghostStates if ghost.scaredTimer == 0]
-    temp.append(0)
-    scoreAdjust += max(temp)
+    temp = [(util.manhattanDistance(ghost.getPosition(), foodPos[min(closestFood)[1]]),ghostId) for ghost, ghostId in zip(ghostStates, range(len(ghostStates))) if ghost.scaredTimer == 0 and len(closestFood) > 0]
+    scoreAdjust += (0.5**(util.manhattanDistance(ghostStates[min(temp)[1]].getPosition(), currentPos)) + 3)*2 if len(temp) > 0 else 0
+
+    wallNum = 0
+    wallNum += 1 if currentGameState.hasWall(currentPos[0]+1, currentPos[1]) else 0
+    wallNum += 1 if currentGameState.hasWall(currentPos[0]-1, currentPos[1]) else 0
+    wallNum += 1 if currentGameState.hasWall(currentPos[0], currentPos[1]+1) else 0
+    wallNum += 1 if currentGameState.hasWall(currentPos[0], currentPos[1]-1) else 0
+    if wallNum == 2:
+        temp = [util.manhattanDistance(ghost.getPosition(), currentPos) < 3 for ghost in ghostStates if ghost.scaredTimer == 0]
+        scoreAdjust -= 5 if len(temp) == len(ghostStates) and all(temp) else 0
+    elif wallNum == 3:
+        scoreAdjust -= 5
+    else:
+        scoreAdjust += 0
+
     return currentGameState.getScore() + scoreAdjust
 
 # Abbreviation
